@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBF Bildirim Sistemi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .type-btn { border-color: #e5e7eb; transition: all 0.2s; }
+        .type-btn.active { border-color: #3b82f6; background-color: #eff6ff; ring: 2px; ring-color: #3b82f6; }
+        .loading { display: none; border-top-color: #3b82f6; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="p-4 flex items-center justify-center min-h-screen">
+
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div class="bg-blue-600 p-8 text-white text-center">
+            <h1 class="text-2xl font-black tracking-tight uppercase">SBF Bildirim Sistemi</h1>
+            <p class="text-xs opacity-90 mt-1 font-semibold">Sorunu bildirin, 8 dakikada çözelim!</p>
+        </div>
+
+        <form id="proForm" class="p-6 space-y-5">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-1.5 ml-1">Konum</label>
+                <div class="relative">
+                    <i class="fa-solid fa-location-dot absolute left-4 top-3.5 text-blue-500"></i>
+                    <select id="loc" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-11 pr-3 text-gray-700 font-bold outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 appearance-none">
+                        <option value="">Konum Seçiniz...</option>
+                        <option value="SBF Zemin Kat">SBF Zemin Kat</option>
+                        <option value="SBF 1. Kat">SBF 1. Kat</option>
+                        <option value="SBF Çevre / Dış Alan">SBF Çevre / Dış Alan</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Sorun Nedir?</label>
+                <div class="grid grid-cols-2 gap-3" id="catGroup">
+                    <button type="button" onclick="setCat(this, 'Temizlik')" class="type-btn flex flex-col items-center border-2 rounded-2xl p-4">
+                        <i class="fa-solid fa-broom text-blue-600 text-xl mb-2"></i>
+                        <span class="text-xs font-bold text-gray-700">Temizlik</span>
+                    </button>
+                    <button type="button" onclick="setCat(this, 'Teknik Arıza')" class="type-btn flex flex-col items-center border-2 rounded-2xl p-4">
+                        <i class="fa-solid fa-screwdriver-wrench text-blue-600 text-xl mb-2"></i>
+                        <span class="text-xs font-bold text-gray-700">Teknik Arıza</span>
+                    </button>
+                    <button type="button" onclick="setCat(this, 'Sarf Malzeme')" class="type-btn flex flex-col items-center border-2 rounded-2xl p-4">
+                        <i class="fa-solid fa-box-open text-blue-600 text-xl mb-2"></i>
+                        <span class="text-xs font-bold text-gray-700">Sarf Malzeme</span>
+                    </button>
+                    <button type="button" onclick="setCat(this, 'Diğer')" class="type-btn flex flex-col items-center border-2 rounded-2xl p-4">
+                        <i class="fa-solid fa-ellipsis text-blue-600 text-xl mb-2"></i>
+                        <span class="text-xs font-bold text-gray-700">Diğer</span>
+                    </button>
+                </div>
+                <input type="hidden" id="selectedCat">
+            </div>
+
+            <div class="relative border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center bg-gray-50 hover:bg-white transition-all">
+                <input type="file" id="photo" accept="image/*" capture="environment" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                <div id="photoStatus">
+                    <i class="fa-solid fa-camera text-2xl text-gray-300 mb-1"></i>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter text-center">Fotoğraf Çek / Kanıt Ekle</p>
+                </div>
+                <div id="loader" class="loading w-7 h-7 border-4 border-gray-200 rounded-full mx-auto"></div>
+                <p id="ready" class="text-xs font-black text-green-600 hidden">RESİM YÜKLENDİ ✅</p>
+            </div>
+
+            <textarea id="note" rows="2" class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-100 outline-none" placeholder="Örn: Sabun bitmiş, lamba yanıyor..."></textarea>
+
+            <button type="submit" id="sendBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-4 rounded-xl shadow-lg transition transform active:scale-95 uppercase">
+                BİLDİRİMİ GÖNDER
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const API_KEY = "BURAYA_API_KEYİNİ_YAZ";
+        const WP_TEL = "905XXXXXXXXX";
+        let finalImg = "";
+
+        // URL Parametresi (Eğer QR'dan gelirse seçim kilitlenir)
+        const params = new URLSearchParams(window.location.search);
+        const qYer = params.get('yer');
+        if (qYer) {
+            const select = document.getElementById('loc');
+            select.value = qYer.replace(/-/g, ' ');
+        }
+
+        function setCat(btn, val) {
+            document.getElementById('selectedCat').value = val;
+            document.querySelectorAll('#catGroup button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        document.getElementById('photo').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            document.getElementById('photoStatus').classList.add('hidden');
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('sendBtn').disabled = true;
+
+            const fd = new FormData();
+            fd.append('image', file);
+            const res = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, { method: 'POST', body: fd });
+            const data = await res.json();
+            finalImg = data.data.url;
+
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('ready').classList.remove('hidden');
+            document.getElementById('sendBtn').disabled = false;
+        });
+
+        document.getElementById('proForm').onsubmit = (e) => {
+            e.preventDefault();
+            const l = document.getElementById('loc').value;
+            const c = document.getElementById('selectedCat').value;
+            const n = document.getElementById('note').value || "Detay yok.";
+            if(!l || !c) return alert("Lütfen Konum ve Sorun Türü seçiniz!");
+
+            let msg = `*🚨 SBF BİLDİRİM SİSTEMİ*%0A%0A📍 *Konum:* ${l}%0A⚠️ *Sorun:* ${c}%0A📝 *Not:* ${n}`;
+            if(finalImg) msg += `%0A📸 *Kanıt:* ${finalImg}`;
+            window.location.href = `https://wa.me/${WP_TEL}?text=${msg}`;
+        };
+    </script>
+</body>
+</html>
