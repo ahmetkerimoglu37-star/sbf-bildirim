@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SBF Hızlı Bildirim</title>
+    <title>SBF-TAM Bildirim</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .active-btn { border-color: #2563eb !important; background-color: #eff6ff !important; transform: scale(0.95); }
+    </style>
 </head>
 <body class="p-4 bg-gray-50 flex items-center justify-center min-h-screen font-sans">
 
@@ -15,65 +18,93 @@
             <p class="text-[10px] font-bold opacity-80 uppercase tracking-widest mt-1">Sorunlar 5 dakikada çözülüyor!</p>
         </div>
 
-        <form id="finalForm" class="p-8 space-y-6">
+        <form id="finalForm" class="p-8 space-y-5">
+            
+            <div class="flex gap-2">
+                <button type="button" onclick="setIdentity(this, 'Öğrenci')" class="identity-btn flex-1 border-2 border-gray-100 rounded-xl py-2 text-xs font-bold uppercase hover:border-blue-500 transition-all">Öğrenci</button>
+                <button type="button" onclick="setIdentity(this, 'Personel')" class="identity-btn flex-1 border-2 border-gray-100 rounded-xl py-2 text-xs font-bold uppercase hover:border-blue-500 transition-all">Personel</button>
+                <input type="hidden" id="selectedIdentity">
+            </div>
+
             <select id="loc" class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl py-3.5 px-4 font-bold text-gray-700 outline-none focus:border-blue-500 transition-all">
                 <option value="">Konum Seçiniz...</option>
                 <option value="SBF Zemin Kat">SBF Zemin Kat</option>
                 <option value="SBF 1. Kat">SBF 1. Kat</option>
+                <option value="SBF Ek Bina">SBF Ek Bina</option>
                 <option value="SBF Çevre">SBF Çevre / Dış Alan</option>
             </select>
 
-            <div class="grid grid-cols-2 gap-4" id="catGroup">
-                <button type="button" onclick="selectCat(this, 'Temizlik')" class="border-2 border-gray-100 rounded-2xl p-4 flex flex-col items-center hover:border-blue-500 transition-all">
-                    <i class="fa-solid fa-broom text-blue-600 text-2xl mb-2"></i>
-                    <span class="text-xs font-bold uppercase">Temizlik</span>
+            <div class="grid grid-cols-2 gap-3" id="typeGroup">
+                <button type="button" onclick="setType(this, 'İstek/Talep')" class="type-btn border-2 border-gray-100 rounded-2xl p-3 flex flex-col items-center hover:border-blue-500 transition-all">
+                    <i class="fa-solid fa-lightbulb text-blue-600 text-xl mb-1"></i>
+                    <span class="text-[10px] font-bold uppercase">İstek / Talep</span>
                 </button>
-                <button type="button" onclick="selectCat(this, 'Arıza')" class="border-2 border-gray-100 rounded-2xl p-4 flex flex-col items-center hover:border-blue-500 transition-all">
-                    <i class="fa-solid fa-wrench text-blue-600 text-2xl mb-2"></i>
-                    <span class="text-xs font-bold uppercase">Arıza</span>
+                <button type="button" onclick="setType(this, 'Şikayet')" class="type-btn border-2 border-gray-100 rounded-2xl p-3 flex flex-col items-center hover:border-blue-500 transition-all">
+                    <i class="fa-solid fa-circle-exclamation text-red-500 text-xl mb-1"></i>
+                    <span class="text-[10px] font-bold uppercase">Şikayet</span>
                 </button>
+                <input type="hidden" id="selectedType">
             </div>
-            <input type="hidden" id="selectedCat">
 
-            <div class="relative border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center bg-gray-50">
+            <div class="grid grid-cols-2 gap-3" id="catGroup">
+                <button type="button" onclick="selectCat(this, 'Temizlik')" class="cat-btn border-2 border-gray-100 rounded-2xl p-3 flex flex-col items-center hover:border-blue-500 transition-all">
+                    <i class="fa-solid fa-broom text-blue-600 text-xl mb-1"></i>
+                    <span class="text-[10px] font-bold uppercase">Temizlik</span>
+                </button>
+                <button type="button" onclick="selectCat(this, 'Arıza')" class="cat-btn border-2 border-gray-100 rounded-2xl p-3 flex flex-col items-center hover:border-blue-500 transition-all">
+                    <i class="fa-solid fa-wrench text-blue-600 text-xl mb-1"></i>
+                    <span class="text-[10px] font-bold uppercase">Arıza</span>
+                </button>
+                <input type="hidden" id="selectedCat">
+            </div>
+
+            <div class="relative border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center bg-gray-50">
                 <input type="file" id="camera" accept="image/*" capture="environment" class="hidden">
                 <div id="camArea" onclick="document.getElementById('camera').click()" class="cursor-pointer">
-                    <i class="fa-solid fa-camera text-3xl text-gray-300 mb-2"></i>
-                    <p id="camStatus" class="text-[10px] font-black text-blue-500 uppercase tracking-widest italic">Fotoğraf Çek ve Yükle</p>
+                    <i class="fa-solid fa-camera text-2xl text-gray-300 mb-1"></i>
+                    <p id="camStatus" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Fotoğraf Çek ve Yükle</p>
                 </div>
-                <div id="loader" class="hidden w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+                <div id="loader" class="hidden w-6 h-6 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
             </div>
 
-            <textarea id="note" rows="2" class="w-full border-2 border-gray-100 rounded-xl p-4 text-sm" placeholder="Ekstra bir notunuz var mı?"></textarea>
+            <textarea id="note" rows="2" class="w-full border-2 border-gray-100 rounded-xl p-3 text-sm" placeholder="Ekstra bir notunuz var mı?"></textarea>
 
             <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl uppercase tracking-widest active:scale-95 transition-all">
-                WhatsApp'a Gönder
+                BİLDİRİMİ GÖNDER
             </button>
         </form>
     </div>
 
     <script>
-        // --- BURAYI DÜZENLE ---
-        const TEL = "905448320046"; // Kendi numaranı yaz
-        const API_KEY = "1014131234c99a74e9c994fb13e48dd2"; // Eğer hata verirse kendi yeni keyini almalısın
-        
+        const TEL = "905448320046"; 
+        const API_KEY = "1014131234c99a74e9c994fb13e48dd2"; 
         let finalPhotoLink = "";
+
+        function setIdentity(btn, val) {
+            document.getElementById('selectedIdentity').value = val;
+            document.querySelectorAll('.identity-btn').forEach(b => b.classList.remove('active-btn'));
+            btn.classList.add('active-btn');
+        }
+
+        function setType(btn, val) {
+            document.getElementById('selectedType').value = val;
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active-btn'));
+            btn.classList.add('active-btn');
+        }
 
         function selectCat(btn, val) {
             document.getElementById('selectedCat').value = val;
-            document.querySelectorAll('#catGroup button').forEach(b => b.className = "border-2 border-gray-100 rounded-2xl p-4 flex flex-col items-center bg-white");
-            btn.className = "border-2 border-blue-500 bg-blue-50 rounded-2xl p-4 flex flex-col items-center transform scale-95";
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active-btn'));
+            btn.classList.add('active-btn');
         }
 
         document.getElementById('camera').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             document.getElementById('camArea').classList.add('hidden');
             document.getElementById('loader').classList.remove('hidden');
             document.getElementById('submitBtn').disabled = true;
 
-            // Görseli küçültme
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = event => {
@@ -82,15 +113,13 @@
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const scale = 0.5; // %50 küçült
+                    const scale = 0.5;
                     canvas.width = img.width * scale;
                     canvas.height = img.height * scale;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
                     canvas.toBlob(blob => {
                         const fd = new FormData();
                         fd.append('image', blob);
-
                         fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, { method: 'POST', body: fd })
                         .then(r => r.json())
                         .then(data => {
@@ -100,12 +129,9 @@
                                 document.getElementById('camArea').classList.remove('hidden');
                                 document.getElementById('camStatus').innerText = "FOTOĞRAF HAZIR ✅";
                                 document.getElementById('camStatus').className = "text-[10px] font-black text-green-600 uppercase";
-                            } else { throw new Error(); }
+                            }
                         })
-                        .catch(() => {
-                            alert("Yükleme başarısız oldu. Lütfen internetinizi kontrol edin veya tekrar deneyin.");
-                            location.reload();
-                        })
+                        .catch(() => alert("Yükleme başarısız!"))
                         .finally(() => document.getElementById('submitBtn').disabled = false);
                     }, 'image/jpeg', 0.6);
                 };
@@ -114,13 +140,15 @@
 
         document.getElementById('finalForm').onsubmit = (e) => {
             e.preventDefault();
+            const id = document.getElementById('selectedIdentity').value;
             const l = document.getElementById('loc').value;
+            const t = document.getElementById('selectedType').value;
             const c = document.getElementById('selectedCat').value;
             const n = document.getElementById('note').value || "Yok";
 
-            if(!l || !c) return alert("Eksik alan!");
+            if(!id || !l || !t || !c) return alert("Lütfen tüm alanları doldurun!");
 
-            const msg = `*🚨 SBF BİLDİRİM*%0A📍 *KONUM:* ${l}%0A⚠️ *SORUN:* ${c}%0A📝 *NOT:* ${n}%0A📸 *FOTO:* ${finalPhotoLink || 'Yüklenemedi'}`;
+            const msg = `*🚨 SBF BİLDİRİM*%0A👤 *KİMDEN:* ${id}%0A📍 *KONUM:* ${l}%0A📌 *TÜR:* ${t}%0A⚠️ *KATEGORİ:* ${c}%0A📝 *NOT:* ${n}%0A📸 *FOTO:* ${finalPhotoLink || 'Yüklenemedi'}`;
             window.location.href = `https://wa.me/${TEL}?text=${msg}`;
         };
     </script>
