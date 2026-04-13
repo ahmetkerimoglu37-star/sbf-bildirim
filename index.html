@@ -85,10 +85,10 @@
             </div>
 
             <div class="relative border-2 border-dashed border-gray-200 rounded-2xl p-4 text-center bg-gray-50">
-                <input type="file" id="camera" accept="image/*" capture="environment" class="hidden">
+                <input type="file" id="camera" accept="image/*" class="hidden">
                 <div id="camArea" onclick="document.getElementById('camera').click()" class="cursor-pointer">
                     <i class="fa-solid fa-camera text-2xl text-gray-300 mb-1"></i>
-                    <p id="camStatus" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Fotoğraf Çek ve Yükle</p>
+                    <p id="camStatus" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Fotoğraf Çek veya Seç</p>
                 </div>
                 <div id="loader" class="hidden w-6 h-6 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
             </div>
@@ -184,7 +184,7 @@
             const r = document.getElementById('ratingValue').value;
             const n = document.getElementById('note').value || "Belirtilmedi";
 
-            const msg = `*🚨 SBF BİLDİRİM<SBF REFLEKS>*%0A👤 *KİMDEN:* ${id}%0A📍 *KONUM:* ${l}%0A📌 *TÜR:* ${t}%0A⚠️ *KATEGORİ:* ${c}%0A⭐ *MEMNUNİYET:* ${r}%0A📝 *NOT:* ${n}%0A📸 *FOTO:* ${finalPhotoLink || 'Eklenmedi'}`;
+            const msg = `*🚨 SBF BİLDİRİM*%0A👤 *KİMDEN:* ${id}%0A📍 *KONUM:* ${l}%0A📌 *TÜR:* ${t}%0A⚠️ *KATEGORİ:* ${c}%0A⭐ *MEMNUNİYET:* ${r}%0A📝 *NOT:* ${n}%0A📸 *FOTO:* ${finalPhotoLink || 'Eklenmedi'}`;
             window.location.href = `https://wa.me/${TEL}?text=${msg}`;
         };
     </script>
