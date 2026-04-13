@@ -10,8 +10,8 @@
         .active-btn { border-color: #2563eb !important; background-color: #eff6ff !important; transform: scale(0.95); }
         select { cursor: pointer; }
         /* Kategori başlıklarını (optgroup) koyulaştırma */
-        optgroup { font-weight: 900 !important; color: #000 !important; font-style: normal; }
-        option { font-weight: normal; }
+        optgroup { font-weight: 900 !important; color: #000 !important; font-style: normal; background-color: #f3f4f6; }
+        option { font-weight: normal; color: #374151; }
         /* Yıldızlar için özel stil */
         .star-rating { display: flex; gap: 8px; justify-content: center; }
         .star-btn { font-size: 1.8rem; color: #d1d5db; transition: all 0.2s; cursor: pointer; }
@@ -41,6 +41,7 @@
                 <option value="Belirtilmedi">Birim / Yer Belirtin...</option>
                 <option value="Fakülte Sekreterliği">Fakülte Sekreterliği</option>
                 <option value="Öğrenci İşleri">Öğrenci İşleri</option>
+                <option value="SBF Kantin">SBF Kantin</option>
                 <option value="SBF Zemin Kat">SBF Zemin Kat</option>
                 <option value="SBF 1. Kat">SBF 1. Kat</option>
                 <option value="SBF Ek Bina">SBF Ek Bina</option>
@@ -52,17 +53,18 @@
                 <option value="İstek/Talep">İstek / Talep</option>
                 <option value="Öneri">Öneri</option>
                 <option value="Şikayet">Şikayet</option>
+                <option value="Diğer">Diğer</option>
             </select>
 
             <select id="selectedCat" class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl py-3.5 px-4 font-bold text-gray-700 outline-none focus:border-blue-500 transition-all">
                 <option value="Belirtilmedi">Kategori Seçiniz...</option>
-                <optgroup label="TEMİZLİK İŞLERİ">
+                <optgroup label="📂 TEMİZLİK İŞLERİ">
                     <option value="Genel Temizlik">Genel Temizlik</option>
                     <option value="Sarf Malz.(Sabun/Kağıt)">Sarf Malz.(Sabun/Kağıt)</option>
                     <option value="Çöp Boşaltma">Çöp Boşaltma</option>
                     <option value="Sıvı Dökülmesi / Hijyen">Sıvı Dökülmesi / Hijyen</option>
                 </optgroup>
-                <optgroup label="TEKNİK ARIZA">
+                <optgroup label="🔧 TEKNİK ARIZA">
                     <option value="Elektrik / Aydınlatma">Elektrik / Aydınlatma</option>
                     <option value="İnternet / Wi-Fi">İnternet / Wi-Fi</option>
                     <option value="Akıllı Tahta / Prejeksiyon">Akıllı Tahta / Prejeksiyon</option>
